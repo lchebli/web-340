@@ -7,8 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+    "text": "node server.js",
+    "start": "node server.spec.js",
+    "test": "jest"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
