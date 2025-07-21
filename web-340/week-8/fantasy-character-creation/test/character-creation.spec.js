@@ -23,11 +23,65 @@ describe("Character Creation Module", () => {
   beforeEach(() => {
     jest.resetModules();
     // TODO: Set up your mocks here
+    jest.mock('fs', () => ({
+    writeFileSync: jest.fn(),
+    readFileSync: jest.fn(),
+    existsSync: jest.fn(),
+    unlinkSync: jest.fn(),
+  }));
     ({ createCharacter, getCharacters } = require('../src/character-creation'));
   });
 
   // TODO: Write your tests here. You should have at least three tests:
   // 1. Test that createCharacter writes a new character to the file
+  // character.test.js
+const { createCharacter } = require('./character');
+
+describe('createCharacter', () => {
+  it('should create a character with name and class', () => {
+    const result = createCharacter('Leslie', 'Wizard');
+    
+    expect(result).toEqual({
+      name: 'Leslie',
+      class: 'Wizard',
+      health: 100,
+      mana: 50,
+    });
+  });
+});
+
   // 2. Test that getCharacters reads characters from the file
+  // characterService.js
+function getCharacters() {
+  return [
+    { name: 'Leslie', class: 'Mage' },
+    { name: 'Thorn', class: 'Rogue' }
+  ];
+}
+
+module.exports = { getCharacters };
+
   // 3. Test that createCharacter handles errors when writing to the file
+  // createCharacter.test.js
+const fs = require('fs');
+const path = require('path');
+
+jest.mock('fs');
+
+describe('createCharacter error handling', () => {
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('should throw an error if writing to the file fails', () => {
+    fs.writeFileSync.mockImplementation(() => {
+      throw new Error('Filesystem write failed');
+    });
+
+    expect(() =>
+      createCharacter('Leslie', 'Mage')
+    ).toThrow('Failed to write character to file');
+  });
+});
+
 });

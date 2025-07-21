@@ -15,32 +15,60 @@
  */
 
 // For callbacks:
-/*
-const fs = require('fs');
+
 
 function createCharacter(character, callback) {
   // TODO: Implement this function
 }
+  const fs = require('fs');
+const path = require('path');
+
+function createCharacter(character, callback) {
+  const filePath = path.join(__dirname, `${character.name}.json`);
+  const data = JSON.stringify(character, null, 2); // Pretty print!
+
+  fs.writeFile(filePath, data, 'utf8', (err) => {
+    if (err) {
+      return callback(new Error('Failed to write character to file'));
+    }
+
+    callback(null, character);
+  });
+}
+
+module.exports = { createCharacter };
+
 
 function getCharacters(callback) {
   // TODO: Implement this function
+  
+  const dirPath = path.join(__dirname, 'characters');
+
+  fs.readdir(dirPath, (err, files) => {
+    if (err) return callback(new Error('Failed to read characters directory'));
+
+    const characters = [];
+
+    let pending = files.length;
+    if (pending === 0) return callback(null, characters);
+
+    files.forEach(file => {
+      const filePath = path.join(dirPath, file);
+
+      fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) return callback(new Error(`Failed to read file: ${file}`));
+
+        try {
+          characters.push(JSON.parse(data));
+        } catch (parseErr) {
+          return callback(new Error(`Invalid JSON in file: ${file}`));
+        }
+
+        pending--;
+        if (pending === 0) callback(null, characters);
+      });
+    });
+  });
 }
-*/
 
-// For promises:
-/*
-const fs = require('fs').promises;
-
-async function createCharacter(character) {
-  // TODO: Implement this function
-}
-
-async function getCharacters() {
-  // TODO: Implement this function
-}
-*/
-
-// Uncomment the appropriate exports depending on whether you're using callbacks or promises:
-
-// module.exports = { createCharacter, getCharacters }; // For callbacks
-// module.exports = { createCharacter, getCharacters }; // For promises
+module.exports = { getCharacters };
